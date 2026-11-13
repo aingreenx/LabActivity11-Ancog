@@ -44,4 +44,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
+
+    /** Officials with an author profile may publish; residents may only comment. */
+    public function canPublish(): bool
+    {
+        return $this->author !== null;
+    }
 }

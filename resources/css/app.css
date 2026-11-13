@@ -1,3 +1,94 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Design tokens. A barangay hall notice board: warm paper, dark ink,
+ * barangay green for actions, marigold for pinned and urgent notices.
+ */
+:root {
+    --paper: 246 242 233;
+    --surface: 255 253 248;
+    --ink: 29 35 31;
+    --muted: 96 102 94;
+    --line: 225 218 202;
+    --brand: 30 84 56;
+    --brand-strong: 21 62 41;
+    --brand-soft: 226 237 228;
+    --accent: 222 160 40;
+    --accent-soft: 251 240 211;
+    --danger: 168 45 35;
+    --danger-soft: 251 233 230;
+}
+
+@layer base {
+    body {
+        @apply bg-paper font-sans text-ink antialiased;
+    }
+
+    h1, h2, h3 {
+        @apply font-display tracking-tight;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-paper
+            motion-safe:active:translate-y-px;
+    }
+
+    .btn-primary {
+        @apply bg-brand text-white hover:bg-brand-strong;
+    }
+
+    .btn-secondary {
+        @apply border border-line bg-surface text-ink hover:border-ink/25 hover:bg-white;
+    }
+
+    .btn-ghost {
+        @apply text-ink hover:bg-ink/5;
+    }
+
+    .field {
+        @apply w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-ink transition
+            placeholder:text-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20;
+    }
+
+    .field-error {
+        @apply border-danger focus:border-danger focus:ring-danger/20;
+    }
+
+    .label {
+        @apply mb-1.5 block text-sm font-semibold text-ink;
+    }
+
+    .hint {
+        @apply mt-1.5 text-xs text-muted;
+    }
+
+    .error-text {
+        @apply mt-1.5 text-sm font-medium text-danger;
+    }
+
+    .card {
+        @apply rounded-xl border border-line bg-surface;
+    }
+
+    .chip {
+        @apply inline-flex items-center gap-1 rounded-full border border-line bg-paper px-2.5 py-0.5 text-xs font-medium text-ink/80 transition
+            hover:border-brand/40 hover:text-brand;
+    }
+
+    .chip-active {
+        @apply border-brand bg-brand text-white hover:text-white;
+    }
+
+    .eyebrow {
+        @apply text-xs font-semibold uppercase tracking-wider text-muted;
+    }
+
+    .link {
+        @apply font-semibold text-brand underline decoration-brand/30 underline-offset-4 transition hover:decoration-brand;
+    }
+}

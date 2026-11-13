@@ -3,17 +3,64 @@
 @section('title', 'Sign in')
 
 @section('content')
-<form method="POST" action="{{ route('login') }}" class="mx-auto mt-10 max-w-sm space-y-4 rounded-lg bg-white p-6 shadow">
-    @csrf
-    <h1 class="text-xl font-bold text-emerald-700">Barangay Bulletin Sign in</h1>
+    <div class="mx-auto grid max-w-5xl gap-10 lg:grid-cols-2 lg:items-center lg:py-6">
+        <div>
+            <p class="eyebrow">Accounts</p>
+            <h1 class="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">Sign in to comment or post</h1>
+            <p class="mt-3 max-w-md text-muted">You can read every notice without an account. Signing in adds what your role allows:</p>
 
-    <input type="email" name="email" value="{{ old('email') }}" placeholder="Email"
-           class="w-full rounded border p-2">
-    @error('email') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+            <dl class="mt-6 space-y-4">
+                <div class="flex gap-3">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand"><x-icon name="chat" class="h-5 w-5" /></span>
+                    <div>
+                        <dt class="font-semibold">Residents</dt>
+                        <dd class="text-sm text-muted">Comment on any notice with your name.</dd>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand"><x-icon name="pen" class="h-5 w-5" /></span>
+                    <div>
+                        <dt class="font-semibold">Barangay officials</dt>
+                        <dd class="text-sm text-muted">Comment, and publish new notices from their author profile.</dd>
+                    </div>
+                </div>
+            </dl>
 
-    <input type="password" name="password" placeholder="Password" class="w-full rounded border p-2">
-    @error('password') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+            <a href="{{ route('posts.index') }}" class="link mt-8 inline-flex items-center gap-1.5 text-sm">
+                Keep reading without an account <x-icon name="arrow-right" />
+            </a>
+        </div>
 
-    <button class="w-full rounded bg-emerald-600 p-2 text-white hover:bg-emerald-700">Sign in</button>
-</form>
+        <form method="POST" action="{{ route('login') }}" class="card flex flex-col gap-5 p-6 sm:p-8">
+            @csrf
+
+            <h2 class="text-2xl font-semibold">Sign in</h2>
+
+            @if ($errors->any())
+                <div role="alert" class="rounded-lg border border-danger/30 bg-danger-soft p-4 text-sm text-danger">
+                    <ul class="list-disc space-y-1 pl-5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div>
+                <label for="email" class="label">Email</label>
+                <input id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="email" autofocus
+                       placeholder="you@bulletin.test" @class(['field min-h-11', 'field-error' => $errors->has('email')])>
+                @error('email') <p class="error-text">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label for="password" class="label">Password</label>
+                <input id="password" type="password" name="password" autocomplete="current-password"
+                       @class(['field min-h-11', 'field-error' => $errors->has('password')])>
+                @error('password') <p class="error-text">{{ $message }}</p> @enderror
+            </div>
+
+            <button class="btn btn-primary w-full">Sign in</button>
+        </form>
+    </div>
 @endsection

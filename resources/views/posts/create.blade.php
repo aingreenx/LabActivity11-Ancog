@@ -3,73 +3,90 @@
 @section('title', 'New post')
 
 @section('content')
-    <a href="{{ route('posts.index') }}" class="text-sm text-emerald-700 hover:underline">← Back to all posts</a>
+    <div class="mx-auto max-w-3xl">
+        <a href="{{ route('posts.index') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-muted transition hover:text-brand">
+            <x-icon name="arrow-left" /> All notices
+        </a>
 
-    <form method="POST" action="{{ route('posts.store') }}" class="mt-4 flex flex-col gap-4 rounded-lg bg-white p-4 shadow sm:p-6">
-        @csrf
+        <h1 class="mt-4 text-3xl font-semibold sm:text-4xl">Write a notice</h1>
+        <p class="mt-2 text-muted">
+            Posting as <strong class="text-ink">{{ auth()->user()->author->name }}</strong>, {{ auth()->user()->author->position }}.
+            Published notices appear on the bulletin right away with your name on them.
+        </p>
 
-        <h1 class="text-2xl font-bold">New post</h1>
+        <form method="POST" action="{{ route('posts.store') }}" class="card mt-6 flex flex-col gap-6 p-5 sm:p-8">
+            @csrf
 
-        @if ($errors->any())
-            <div class="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                <p class="font-medium">Please fix the following:</p>
-                <ul class="mt-1 list-disc pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+            @if ($errors->any())
+                <div role="alert" class="rounded-lg border border-danger/30 bg-danger-soft p-4 text-sm text-danger">
+                    <p class="flex items-center gap-2 font-semibold"><x-icon name="alert" /> Fix {{ $errors->count() === 1 ? 'this' : 'these' }} before saving:</p>
+                    <ul class="mt-2 list-disc space-y-1 pl-6">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div>
+                <label for="title" class="label">Title</label>
+                <input id="title" name="title" value="{{ old('title') }}" maxlength="120" placeholder="e.g. Free anti-rabies vaccination at the barangay hall"
+                       @class(['field min-h-11', 'field-error' => $errors->has('title')])>
+                @error('title') <p class="error-text">{{ $message }}</p> @enderror
+                <p class="hint">Up to 120 characters.</p>
+            </div>
+
+            <div>
+                <label for="category" class="label">Category</label>
+                <select id="category" name="category" @class(['field min-h-11 sm:max-w-xs', 'field-error' => $errors->has('category')])>
+                    <option value="">Choose a category</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category }}" @selected(old('category') === $category)>{{ $category }}</option>
                     @endforeach
-                </ul>
+                </select>
+                @error('category') <p class="error-text">{{ $message }}</p> @enderror
             </div>
-        @endif
 
-        <div>
-            <label for="title" class="block text-sm font-medium">Title</label>
-            <input id="title" name="title" value="{{ old('title') }}" maxlength="120"
-                   class="mt-1 w-full rounded border px-3 py-2 @error('title') border-red-500 @else border-slate-300 @enderror">
-            @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label for="category" class="block text-sm font-medium">Category</label>
-            <select id="category" name="category"
-                    class="mt-1 w-full rounded border px-3 py-2 @error('category') border-red-500 @else border-slate-300 @enderror">
-                <option value="">Choose a category</option>
-                @foreach ($categories as $category)
-                    <option value="{{ $category }}" @selected(old('category') === $category)>{{ $category }}</option>
-                @endforeach
-            </select>
-            @error('category') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label for="body" class="block text-sm font-medium">Body</label>
-            <textarea id="body" name="body" rows="6"
-                      class="mt-1 w-full rounded border px-3 py-2 @error('body') border-red-500 @else border-slate-300 @enderror">{{ old('body') }}</textarea>
-            @error('body') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-        </div>
-
-        <fieldset>
-            <legend class="text-sm font-medium">Tags</legend>
-            <div class="mt-1 flex flex-wrap gap-3">
-                @foreach ($tags as $tag)
-                    <label class="flex items-center gap-1 text-sm">
-                        <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
-                               @checked(in_array($tag->id, old('tags', [])))>
-                        {{ $tag->name }}
-                    </label>
-                @endforeach
+            <div>
+                <label for="body" class="label">Notice</label>
+                <textarea id="body" name="body" rows="8" placeholder="What, when, where, and who should come."
+                          @class(['field leading-relaxed', 'field-error' => $errors->has('body')])>{{ old('body') }}</textarea>
+                @error('body') <p class="error-text">{{ $message }}</p> @enderror
+                <p class="hint">At least 20 characters.</p>
             </div>
-            @error('tags') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-            @error('tags.*') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-        </fieldset>
 
-        <div>
-            <label class="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="is_published" value="1" @checked(old('is_published'))>
-                Publish now
-            </label>
-            @error('is_published') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-        </div>
+            <fieldset>
+                <legend class="label">Tags</legend>
+                <p class="-mt-1 mb-3 text-xs text-muted">Pick at least one. Residents filter the bulletin by these.</p>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($tags as $tag)
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="tags[]" value="{{ $tag->id }}" class="peer sr-only"
+                                   @checked(in_array($tag->id, old('tags', [])))>
+                            <span class="chip min-h-11 px-4 text-sm peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand peer-focus-visible:ring-offset-2">#{{ $tag->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                @error('tags') <p class="error-text">{{ $message }}</p> @enderror
+                @error('tags.*') <p class="error-text">{{ $message }}</p> @enderror
+            </fieldset>
 
-        <button class="self-start rounded bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800">Save post</button>
-    </form>
+            <div class="rounded-lg border border-line bg-paper p-4">
+                <label class="flex cursor-pointer items-start gap-3">
+                    <input type="checkbox" name="is_published" value="1" @checked(old('is_published'))
+                           class="mt-0.5 h-5 w-5 rounded border-line text-brand accent-[rgb(var(--brand))] focus:ring-brand">
+                    <span>
+                        <span class="block text-sm font-semibold">Publish now</span>
+                        <span class="block text-xs text-muted">Leave unticked to save a draft. Drafts are not shown on the bulletin.</span>
+                    </span>
+                </label>
+                @error('is_published') <p class="error-text">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:justify-end">
+                <a href="{{ route('posts.index') }}" class="btn btn-secondary">Cancel</a>
+                <button class="btn btn-primary">Save notice</button>
+            </div>
+        </form>
+    </div>
 @endsection
