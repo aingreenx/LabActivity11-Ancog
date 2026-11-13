@@ -35,9 +35,14 @@ class CommentSeeder extends Seeder
         $kagawad = User::where('email', 'kagawad.ancog@bulletin.test')->firstOrFail();
         $resident = $users->whereNotIn('id', [$lola->id, $kagawad->id])->random();
 
-        // Created through the relation, so post_id is filled in automatically.
+        // Lola's comment goes through User -> comments (hasMany), so user_id is filled in.
+        $lola->comments()->create([
+            'post_id' => $pinned->id,
+            'body' => 'I will bring extra walis tingting for the young ones. See you all at the hall!',
+        ]);
+
+        // The rest go through Post -> comments (hasMany), so post_id is filled in.
         $pinned->comments()->createMany([
-            ['user_id' => $lola->id, 'body' => 'I will bring extra walis tingting for the young ones. See you all at the hall!'],
             ['user_id' => $resident->id, 'body' => 'Our family will join. What time does the clean-up start?'],
             ['user_id' => $kagawad->id, 'body' => 'Assembly is at 6:00 AM. Salamat sa tanan nga moapil!'],
         ]);

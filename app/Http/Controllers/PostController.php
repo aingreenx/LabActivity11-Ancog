@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IndexPostRequest;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
 use App\Models\Tag;
@@ -16,14 +17,8 @@ class PostController extends Controller
 {
     private const POSTS_PER_PAGE = 6;
 
-    public function index(Request $request): View
+    public function index(IndexPostRequest $request): View
     {
-        $request->validate([
-            'q' => ['nullable', 'string'],
-            'category' => ['nullable', 'string'],
-            'tag' => ['nullable', 'string'],
-        ]);
-
         // Eager-load author and tags and count comments in the same handful of
         // queries, so the cards never trigger one query per post (no N+1).
         $posts = Post::query()
@@ -42,7 +37,11 @@ class PostController extends Controller
             ->withQueryString();
 
         $categories = Post::query()->distinct()->orderBy('category')->pluck('category');
-        $tags = Tag::query()->orderBy('name')->pluck('name');
+        // Tag -> posts (belongsToMany, the other direction) counts published posts per tag.
+        $tags = Tag::query()
+            ->withCount(['posts' => fn ($query) => $query->where('is_published', true)])
+            ->orderBy('name')
+            ->get();
 
         return view('posts.index', compact('posts', 'categories', 'tags'));
     }
