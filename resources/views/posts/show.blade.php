@@ -33,6 +33,35 @@
     <section class="mt-6 rounded-lg bg-white p-4 shadow sm:p-6">
         <h2 class="text-lg font-semibold">{{ $post->comments->count() }} {{ Str::plural('Comment', $post->comments->count()) }}</h2>
 
+        @auth
+            <form method="POST" action="{{ route('comments.store', $post) }}" class="mt-4 flex flex-col gap-2">
+                @csrf
+
+                @if ($errors->any())
+                    <div class="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        <ul class="list-disc pl-5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <label for="body" class="text-sm font-medium">Add a comment</label>
+                <textarea id="body" name="body" rows="3"
+                          class="w-full rounded border px-3 py-2 @error('body') border-red-500 @else border-slate-300 @enderror">{{ old('body') }}</textarea>
+                @error('body') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+
+                <button class="self-start rounded bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800">Post comment</button>
+            </form>
+        @endauth
+
+        @guest
+            <p class="mt-4 text-sm">
+                <a href="{{ route('login') }}" class="text-emerald-700 underline">Sign in to comment</a>
+            </p>
+        @endguest
+
         <ul class="mt-4 divide-y divide-slate-100">
             @forelse ($post->comments as $comment)
                 <li class="py-3">

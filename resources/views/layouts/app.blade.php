@@ -16,6 +16,9 @@
 
             <nav class="flex items-center gap-4 text-sm">
                 @auth
+                    @if (auth()->user()->author)
+                        <a href="{{ route('posts.create') }}" class="rounded bg-white px-3 py-1 font-medium text-emerald-700 hover:bg-emerald-50">New post</a>
+                    @endif
                     <span>Hi, {{ auth()->user()->name }}</span>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
@@ -31,6 +34,10 @@
     </header>
 
     <main class="mx-auto max-w-5xl px-4 py-6">
+        @if (session('status'))
+            <p class="mb-4 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-800">{{ session('status') }}</p>
+        @endif
+
         @yield('content')
     </main>
 </body>

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
 use App\Models\Tag;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -42,6 +45,36 @@ class PostController extends Controller
         $tags = Tag::query()->orderBy('name')->pluck('name');
 
         return view('posts.index', compact('posts', 'categories', 'tags'));
+    }
+
+    public function create(Request $request): View
+    {
+        // Same rule as StorePostRequest::authorize(): residents without an author profile get 403.
+        abort_if($request->user()->author === null, 403);
+
+        $categories = Post::CATEGORIES;
+        $tags = Tag::query()->orderBy('name')->get();
+
+        return view('posts.create', compact('categories', 'tags'));
+    }
+
+    public function store(StorePostRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        // Created through the author's posts relation, so author_id is set for us.
+        $post = $request->user()->author->posts()->create([
+            ...Arr::except($data, 'tags'),
+            'published_at' => $data['is_published'] ? now() : null,
+        ]);
+
+        $post->tags()->sync($data['tags']);
+
+        if (! $post->is_published) {
+            return redirect()->route('posts.index')->with('status', 'Draft saved.');
+        }
+
+        return redirect()->route('posts.show', $post->id)->with('status', 'Post published.');
     }
 
     public function show(string $id): View

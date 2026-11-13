@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Post extends Model
 {
     use HasFactory;
+
+    /** The five Lab 10 categories, shared by the create form and StorePostRequest. */
+    public const CATEGORIES = ['Announcement', 'Health', 'Peace & Order', 'Ayuda', 'Disaster Preparedness'];
+
     protected $fillable = ['author_id', 'title', 'category', 'body',
                            'is_published', 'is_pinned', 'published_at', 'views'];
     protected $casts = [
