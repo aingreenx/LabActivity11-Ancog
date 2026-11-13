@@ -17,7 +17,7 @@ The seeder also creates 8 resident accounts with the user factory (password `pas
 
 ## My 5 tags
 
-**Purok Ancog**, **Urgent**, **Health**, **Ayuda**, **Disaster Preparedness**
+**Purok Ancog**, **Urgent**, **Libre**, **Schedule**, and my own choice **Ayuda** (for relief-goods distributions, which are some of the most-asked-about posts at the hall).
 
 Every post gets 1–3 random tags. The pinned "Purok Ancog Clean-up Drive" post always has exactly Purok Ancog and Urgent (set with `sync()`).
 

@@ -10,7 +10,7 @@ use Illuminate\Database\Seeder;
 
 class TagSeeder extends Seeder
 {
-    private const TAGS = ['Purok Ancog', 'Urgent', 'Health', 'Ayuda', 'Disaster Preparedness'];
+    private const TAGS = ['Purok Ancog', 'Urgent', 'Libre', 'Schedule', 'Ayuda'];
 
     /**
      * Run the database seeds.
